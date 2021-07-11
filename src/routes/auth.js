@@ -2,14 +2,31 @@ const express = require("express");
 const mysql = require("mysql2/promise");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const Joi = require("joi");
 const router = express.Router();
 
 const { mysqlConfig, jwtSecret } = require("../config");
+
+const schema = Joi.object({
+  email: Joi.string().email().min(5).max(255).required(),
+  password: Joi.string().min(8).max(255).required(),
+});
 
 router.post("/register", async (req, res) => {
   if (!req.body.email || !req.body.password) {
     return res.status(400).send({ error: "Insufficient data provided" });
   }
+
+  try {
+    const value = await schema.validateAsync({
+      email: req.body.email,
+      password: req.body.password,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send({ error: "Insufficient data provided" });
+  }
+
   try {
     const hashedPassword = bcrypt.hashSync(req.body.password, 8);
 
@@ -36,6 +53,16 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   if (!req.body.email || !req.body.password) {
+    return res.status(400).send({ error: "Insufficient data provided" });
+  }
+
+  try {
+    const value = await schema.validateAsync({
+      email: req.body.email,
+      password: req.body.password,
+    });
+  } catch (err) {
+    console.log(err);
     return res.status(400).send({ error: "Insufficient data provided" });
   }
 
