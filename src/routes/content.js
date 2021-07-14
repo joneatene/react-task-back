@@ -3,8 +3,9 @@ const router = express.Router();
 const middleware = require("../middleware");
 const mysql = require("mysql2/promise");
 const { mysqlConfig } = require("../config");
+const { loggedIn } = require("../middleware");
 
-router.get("/teams", async (req, res) => {
+router.get("/", middleware.loggedIn, async (req, res) => {
   try {
     const con = await mysql.createConnection(mysqlConfig);
 
@@ -21,3 +22,5 @@ router.get("/teams", async (req, res) => {
     return res.status(500).send({ error: "Database error" });
   }
 });
+
+module.exports = router;
