@@ -73,7 +73,7 @@ router.post("/login", async (req, res) => {
     return res.send({ message: "Successfully logged in", token });
   } catch (e) {
     console.log(e);
-    res.status(500).send({ error: "DB error" });
+    res.status(500).send({ e });
   }
 });
 
